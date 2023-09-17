@@ -1,0 +1,65 @@
+<!-- game.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Game of Three</title>
+  </head>
+  <body>
+    <h1>Game of Three</h1>
+    <button id="startButton">Start Game</button>
+    <div id="messages"></div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      
+      const socket = io();
+
+      socket.on('setCookie', (c) => {
+        // Store the clientId in a cookie so it's retained across page reloads
+        document.cookie = `playerClient=${JSON.stringify(c)}`;
+      });
+
+      socket.on('started', (message) => {
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.innerHTML = '';
+        appendMessage(message)
+      });
+
+      socket.on('play', (message) => {
+        socket.emit('play', message);
+      });
+
+      socket.on('startError',(error)=>{
+        alert(error);
+      })
+
+      socket.on('message', (message) => {
+        console.log('message: ' + message);
+        // Create a new message element
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+
+        // Append the message to the messages container
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.appendChild(messageElement);
+      });
+
+      const startButton = document.getElementById('startButton');
+      startButton.addEventListener('click', () => {
+        // Emit the 'start' message when the button is clicked
+        socket.emit('start', 'Start the game!');
+      });
+
+      window.addEventListener('beforeunload', () => {
+        // Emit the 'disjoin' message when the page is refreshed or the browser is closed
+        socket.emit('disjoin', 'Leaving the game!');
+      });
+
+      function appendMessage(message){
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        const messagesContainer = document.getElementById('messages');
+        messagesContainer.appendChild(messageElement);
+      }
+    </script>
+  </body>
+</html>
