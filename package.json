@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon",
+    "start": "nodemon",
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
+  "author": "Asma Gheisari",
   "license": "ISC",
   "dependencies": {
     "@types/ws": "^8.5.5",
