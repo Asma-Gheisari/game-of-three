@@ -1,6 +1,24 @@
 # Game of Three
 Game of Three is a two-player game implemented in Node.js that utilizes Socket.io for real-time communication between players. This README provides an overview of the project's folder structure, key components, and additional information about assumptions and limitations.
 
+## Interaction Flow
+
+In the Game of Three, clients interact with the server by sending a request to the following endpoint:
+
+`localhost:3000/game`
+
+Upon making this request, the server responds by serving the `Game.html` file to the clients. This HTML page is the entry point for players and serves as the user interface for the game.
+
+### Socket Connection
+
+The server establishes a WebSocket (Socket.io) connection on application startup. When clients open the served `Game.html` page, they automatically connect to this WebSocket. The WebSocket connection is a crucial component for enabling real-time communication and coordination between players during the game.
+
+### GameCoordinator
+
+The `GameCoordinator` plays a pivotal role in the Game of Three. It is in charge of coordinating the game and managing player interactions. When clients connect to the WebSocket, they are automatically joined to a `GameCoordinator` instance. This coordination ensures that players can communicate, initiate games, and play rounds seamlessly.
+
+The `GameCoordinator` orchestrates the flow of the game, including starting new games, handling player moves, and determining game outcomes. It ensures that the two-player limit is maintained for each game session.
+
 # Folder Structure
 The project's folder structure is organized as follows:
 
