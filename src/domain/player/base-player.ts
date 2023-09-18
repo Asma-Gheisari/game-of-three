@@ -1,19 +1,18 @@
-import { Socket } from "socket.io";
-import Client from "../client/client";
-import { SocketClient } from "../client/socket-client";
 import MoveStrategy from "../move/move-strategy";
 import MoveResult from "../move/move-result";
+import { MessageChannel } from "../messaging/message-channel";
+import Client from "../client/client";
 
-export abstract class BasePlayer<T> implements SocketClient {
-  protected _strategy: MoveStrategy<T>;
+export abstract class BasePlayer<T, U> implements Client<U> {
+  protected strategy: MoveStrategy<T>;
 
   constructor(
     strategy: MoveStrategy<T>,
+    readonly messageChannel: MessageChannel<U>,
     readonly name: string,
-    readonly clientId: string,
-    readonly socket: Socket
+    readonly clientId: string
   ) {
-    this._strategy = strategy;
+    this.strategy = strategy;
   }
 
   abstract play(num: number): MoveResult<T>;

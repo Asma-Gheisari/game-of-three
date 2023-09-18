@@ -1,19 +1,19 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { Communication } from "./communication";
-import { SocketClient } from "../domain/client/socket-client";
 import { EVENT_NAME } from "../configurations/socket-events";
+import Client from "../domain/client/client";
 
 export abstract class SocketCommunication
-  implements Communication<SocketClient>
+  implements Communication<Socket>
 {
-  protected connectedClients: Array<SocketClient> = [];
+  connectedClients: Array<Client<Socket>> = [];
   constructor(protected readonly io: Server) {}
 
-  join(client: SocketClient): void {
+  join(client: Client<Socket>): void {
     this.connectedClients.push(client);
   }
 
-  disjoin(client: SocketClient): void {
+  disjoin(client: Client<Socket>): void {
     const indexToRemove = this.connectedClients.findIndex(
       (item) => item.clientId === client.clientId
     );
@@ -22,8 +22,8 @@ export abstract class SocketCommunication
     }
   }
 
-  sendMessage(receiver: SocketClient, event: string, payload: string): void {
-    receiver.socket.emit(event, payload);
+  sendMessage(receiver: Client<Socket>, event: string, payload: string): void {
+    receiver.messageChannel.sendMessage(event, payload);
   }
 
   broadcastMessage(event: EVENT_NAME, message: string): void {

@@ -2,8 +2,9 @@ import Game from "./game";
 import GameStartError from "../../exceptions/game-start.exception";
 import GameOfThreePlayer from "../player/game-of-three-player";
 import MoveResult from "../move/move-result";
+import { Socket } from "socket.io";
 
-export default class GameOfThree extends Game<GameOfThreePlayer> {
+export default class GameOfThree extends Game<number, Socket> {
   readonly numberOfPlayers: number = 2;
   private players: GameOfThreePlayer[];
 

@@ -10,6 +10,7 @@ import { ExceptionHandlerMiddleware } from "./middlewares/exception-handler.midd
 import { GameOfThreePlayerFactory } from "./domain/player/game-of-three-player-factory";
 import DefaultMoveStrategy from "./domain/move/default-move-strategy";
 import { POSSIBLE_MOVES } from "./configurations/general";
+import CookieManager from "./application/cookie-manager";
 
 export default class ExpressApp {
   private readonly app: express.Application;
@@ -24,7 +25,8 @@ export default class ExpressApp {
     this.gameCoordinator = new GameCoordinator<number>(
       io,
       new GameOfThreePlayerFactory(new DefaultMoveStrategy(POSSIBLE_MOVES)),
-      new GameOfThree()
+      new GameOfThree(),
+      new CookieManager()
     );
 
     this.setupMiddlewares();

@@ -2,18 +2,20 @@ import { Socket } from "socket.io";
 import { BasePlayer } from "./base-player";
 import MoveStrategy from "../move/move-strategy";
 import MoveResult from "../move/move-result";
+import { SocketMessageChannel } from "../messaging/socket-message-channel";
+import { MessageChannel } from "../messaging/message-channel";
 
-export default class GameOfThreePlayer extends BasePlayer<number> {
+export default class GameOfThreePlayer extends BasePlayer<number, Socket> {
   constructor(
     strategy: MoveStrategy<number>,
+    channel: MessageChannel<Socket>,
     readonly name: string,
-    readonly clientId: string,
-    readonly socket: Socket
+    readonly clientId: string
   ) {
-    super(strategy, name, clientId, socket);
+    super(strategy, channel, name, clientId);
   }
 
   play(num?): MoveResult<number> {
-    return this._strategy.calculate(num);
+    return this.strategy.calculate(num);
   }
 }

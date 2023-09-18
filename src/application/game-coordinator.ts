@@ -5,28 +5,40 @@ import { SocketCommunication } from "../infrastructure/socket-communication";
 import { PlayerFactory } from "../domain/player/player-factory";
 import Game from "../domain/game/game";
 import { BasePlayer } from "../domain/player/base-player";
+import { SocketMessageChannel } from "../domain/messaging/socket-message-channel";
+import CookieManager from "./cookie-manager";
+import ClientData from "./client-data";
 const cookie = require("cookie");
 const { v4: uuidv4 } = require("uuid");
 
 export default class GameCoordinator<T> extends SocketCommunication {
-  connectedClients: Array<BasePlayer<T>> = [];
-  private readonly playerFactory: PlayerFactory<T>;
-  private readonly game: Game<BasePlayer<T>>;
+  connectedClients: Array<BasePlayer<T, Socket>> = [];
+  private readonly playerFactory: PlayerFactory<T, Socket>;
+  private readonly game: Game<T, Socket>;
+  private readonly cookieManager: CookieManager;
 
   constructor(
     io: Server,
-    playerFactory: PlayerFactory<T>,
-    game: Game<BasePlayer<T>>
+    playerFactory: PlayerFactory<T, Socket>,
+    game: Game<T, Socket>,
+    cookieManager: CookieManager
   ) {
     super(io);
     this.playerFactory = playerFactory;
     this.game = game;
+    this.cookieManager = cookieManager;
     this.initializeSocketEvents();
   }
 
   protected initializeSocketEvents() {
     this.io.on(EVENT_NAME.Join, (socket: Socket) => {
-      const player = this.initializePlayerAndCookies(socket);
+      const clientCookie = this.cookieManager.parseCookie(
+        cookie.parse(socket.handshake.headers.cookie || "")
+      );
+
+      const player = this.initializePlayer(socket, clientCookie);
+
+      this.setClientCookieIfNotPresent(player, clientCookie);
 
       this.join(player);
 
@@ -57,7 +69,7 @@ export default class GameCoordinator<T> extends SocketCommunication {
     });
   }
 
-  private handleRoundOutcome(player: BasePlayer<T>) {
+  private handleRoundOutcome(player: BasePlayer<T, Socket>) {
     if (this.game.currentMove.resultingNumber === 1) {
       this.broadcastMessage(
         EVENT_NAME.Message,
@@ -77,57 +89,39 @@ export default class GameCoordinator<T> extends SocketCommunication {
         playerName: player.name,
         generated: this.game.currentMove,
       };
-      this.sendMessage(
-        this.game.currentPlayer,
+      this.game.currentPlayer.messageChannel.sendMessage(
         EVENT_NAME.PlayRound,
         JSON.stringify(payload)
       );
     }
   }
 
-  private initializePlayerAndCookies(socket: Socket): BasePlayer<T> {
-    const cookies = cookie.parse(socket.handshake.headers.cookie || "");
+  private initializePlayer(
+    socket: Socket,
+    cookie?: ClientData
+  ): BasePlayer<T, Socket> {
+    const clientId: string = cookie?.clientId || uuidv4();
+    const playerName: string =
+      cookie?.playerName || `Player ${this.connectedClients.length + 1}`;
 
-    const { clientId, playerName } = this.extractClientData(cookies);
-
-    const player = this.createPlayerWithDefaults(playerName, clientId, socket);
-
-    this.setClientCookieIfNotPresent(socket, clientId, playerName);
+    const player = this.playerFactory.createPlayer(
+      playerName,
+      clientId,
+      new SocketMessageChannel(socket)
+    );
 
     return player;
   }
 
-  private extractClientData(cookies: Record<string, string>): {
-    clientId: string;
-    playerName: string;
-  } {
-    const playerClientData =
-      cookies.playerClient && JSON.parse(cookies.playerClient);
-
-    const clientId = playerClientData?.clientId || uuidv4();
-    const playerName =
-      playerClientData?.playerName ||
-      `Player ${this.connectedClients.length + 1}`;
-
-    return { clientId, playerName };
-  }
-
-  private createPlayerWithDefaults(
-    playerName: string,
-    clientId: string,
-    socket: Socket
-  ): BasePlayer<T> {
-    return this.playerFactory.createPlayer(playerName, clientId, socket);
-  }
-
   private setClientCookieIfNotPresent(
-    socket: Socket,
-    clientId: string,
-    playerName: string
+    player: BasePlayer<T, Socket>,
+    clientData?: ClientData
   ): void {
-    if (Object.keys(socket.handshake.headers.cookie || {}).length === 0) {
-      const clientData = { clientId, playerName };
-      socket.emit(EVENT_NAME.SetCookie, clientData);
+    if (clientData === undefined) {
+      player.messageChannel.sendMessage(
+        EVENT_NAME.SetCookie,
+        JSON.stringify(new ClientData(player.clientId, player.name))
+      );
     }
   }
 }
