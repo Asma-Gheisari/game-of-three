@@ -106,7 +106,7 @@ These interfaces define player factory methods. The GameOfThreePlayerFactory cre
 
 **Simple UI:** The user interface (UI) is currently a basic HTML page with no design or layout. It serves as a minimal frontend for the game.
 
-#### Future Enhancements
+## Future Enhancements
 This project can be extended and improved in various ways:
 
 **Exception Handling:** Implement robust exception-handling strategies to cover various error scenarios and improve error messaging.
