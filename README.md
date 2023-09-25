@@ -117,4 +117,5 @@ This project can be extended and improved in various ways:
 
 **Enhanced UI with React:** Develop a more sophisticated user interface for the game using technologies like React to provide a better user experience, including features such as real-time game updates and interactive gameplay elements.
 
+**Security:** The cookie is being set client-side which is accessible to any scripts running on the same page. It is better to be configured server-side and manage the Cross-Origing concerns, For example by using samesite attribute. Also, there is no Authentication/Authorization mechanism. On the other hand, the data is being exchanged among players in plain text, while it is better to encrypt the sensitive data.
 
