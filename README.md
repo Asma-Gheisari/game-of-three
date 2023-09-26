@@ -23,19 +23,33 @@ The `GameCoordinator` orchestrates the flow of the game, including starting new 
 The project's folder structure is organized as follows:
 
 ├───application
+
 ├───configurations
+
 ├───controllers
+
 ├───domain
+
 │   ├───client
+
 │   ├───game
+
 │   ├───messaging
+
 │   ├───move
+
 │   └───player
+
 ├───exceptions
+
 ├───infrastructure
+
 ├───middlewares
+
 ├───routers
+
 ├───services
+
 └───test
 
 **application:** Contains application-specific files.
@@ -51,11 +65,11 @@ The project's folder structure is organized as follows:
 **infrastructure:** Includes infrastructure-related components.
 **middlewares:** Holds Express middleware functions.
 **routers:** Defines Express routers for handling routes.
-**services: **Contains service classes.
+**services:** Contains service classes.
 **test:** Contains test files.
 # Project Components
 ### ExpressApp
-The ExpressApp class sets up an Express.js application with Socket.io integration. It initializes the game coordinator, configures middlewares, and sets up routes.
+The ExpressApp class sets up an Express.js application with Socket.io integration. It initializes the game coordinator, configures middleware, and sets up routes.
 
 ### Client and MessageChannel
 These interfaces define client and message channel properties and methods for communication between players.
@@ -84,18 +98,18 @@ These interfaces define player factory methods. The GameOfThreePlayerFactory cre
 **Game Start Policy:** A game can only commence when precisely two players are connected. Each Player is free to start the game.
 
 **Limitations**
-**Limited Test Coverage: **The current implementation includes only basic test coverage with two sample tests. Extending test coverage is recommended for comprehensive testing.
+**Limited Test Coverage:** The current implementation includes only basic test coverage with two sample tests. Extending test coverage is recommended for comprehensive testing.
 
-**Basic Exception Handling: **The current exception handling focuses on the GameStart exception, and an exception handling middleware is set up for HTTP errors. For production readiness, a more comprehensive exception handling strategy should be implemented.
+**Basic Exception Handling:** The current exception handling focuses on the GameStart exception, and an exception handling middleware is set up for HTTP errors. For production readiness, a more comprehensive exception-handling strategy should be implemented.
 
 **Dependency Decoupling:** While the project utilizes Socket.io, further architectural work is necessary to ensure clean decoupling from specific libraries or packages, making it easier to swap out underlying technologies without extensive code changes.
 
 **Simple UI:** The user interface (UI) is currently a basic HTML page with no design or layout. It serves as a minimal frontend for the game.
 
-#### Future Enhancements
+## Future Enhancements
 This project can be extended and improved in various ways:
 
-**Exception Handling: **Implement robust exception handling strategies to cover various error scenarios and improve error messaging.
+**Exception Handling:** Implement robust exception-handling strategies to cover various error scenarios and improve error messaging.
 
 **Extended Testing:** Expand test coverage to thoroughly validate the functionality and edge cases of the application.
 
@@ -103,4 +117,5 @@ This project can be extended and improved in various ways:
 
 **Enhanced UI with React:** Develop a more sophisticated user interface for the game using technologies like React to provide a better user experience, including features such as real-time game updates and interactive gameplay elements.
 
+**Security:** The cookie is being set client-side which is accessible to any scripts running on the same page. It is better to be configured server-side and manage the Cross-Origing concerns, For example by using samesite attribute. Also, there is no Authentication/Authorization mechanism. On the other hand, the data is being exchanged among players in plain text, while it is better to encrypt the sensitive data.
 
