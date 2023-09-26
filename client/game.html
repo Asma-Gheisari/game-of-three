@@ -7,6 +7,8 @@
   <body>
     <h1>Game of Three</h1>
     <button id="startButton">Start Game</button>
+    &nbsp;
+    <button id="clearButton">Clear pan</button>
     <div id="messages"></div>
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -15,12 +17,10 @@
 
       socket.on('setCookie', (c) => {
         // Store the clientId in a cookie so it's retained across page reloads
-        document.cookie = `playerClient=${JSON.stringify(c)}`;
+        document.cookie = `playerClient=${c}`;
       });
 
       socket.on('started', (message) => {
-        const messagesContainer = document.getElementById('messages');
-        messagesContainer.innerHTML = '';
         appendMessage(message)
       });
 
@@ -44,9 +44,14 @@
       });
 
       const startButton = document.getElementById('startButton');
+      const clearButton = document.getElementById('clearButton');
       startButton.addEventListener('click', () => {
         // Emit the 'start' message when the button is clicked
         socket.emit('start', 'Start the game!');
+      });
+
+      clearButton.addEventListener('click', () => {
+        document.getElementById('messages').textContent = '';
       });
 
       window.addEventListener('beforeunload', () => {
